@@ -31,12 +31,12 @@ responseBody:
 | error | string | 密码或用户名错误 |
 
 ```http
-POST http://localhost:8080/api/login
+POST http://localhost:8000/api/login
 Content-Type: application/json
 
 {
   "username": "aa",
-  "password": "aa"
+  "password": "aaa"
 }
 ```
 
