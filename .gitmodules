@@ -1,3 +1,6 @@
 [submodule "elysia_demo"]
 	path = elysia_demo
 	url = git@github.com:Nahida-aa/elysia_demo.git
+[submodule "spring_demo"]
+	path = spring_demo
+	url = git@github.com:Nahida-aa/spring_demo.git
