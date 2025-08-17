@@ -4,3 +4,9 @@
 [submodule "spring_demo"]
 	path = spring_demo
 	url = git@github.com:Nahida-aa/spring_demo.git
+[submodule "fastapi_demo"]
+	path = fastapi_demo
+	url = git@github.com:Nahida-aa/fastapi_demo.git
+[submodule "hono_demo"]
+	path = hono_demo
+	url = git@github.com:Nahida-aa/hono_demo.git

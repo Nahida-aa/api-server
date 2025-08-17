@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "java-dev": "cd springBoot && ./gradlew bootRun --continuous"
+    "spring-dev": "cd spring_demo && ./gradlew bootRun --continuous"
   },
   "keywords": [],
   "author": "",
