@@ -1,0 +1,19 @@
+[package]
+name = "axum_demo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { version = "1.45.1", features = ["full"] }
+axum = "0.8.4"
+# api docs
+utoipa = { version = "5.4", features = ["axum_extras"] }
+utoipa-axum = "0.2"
+utoipa-scalar = { version = "0.3", features = ["axum"] }
+# 反序列化
+serde = { version = "1.0.219", features = ["derive"] }
+# config
+config = { version = "0.15.14", features = ["yaml"] }
+# log
+tracing = { version = "0.1.41", features = ["async-await"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "chrono"] }

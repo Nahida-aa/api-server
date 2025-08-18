@@ -1,0 +1,13 @@
+GET http://localhost:3000/
+
+###
+POST http://localhost:3000/hello
+
+###
+GET http://localhost:3000/null
+
+###
+GET http://localhost:3000/note
+
+###
+GET http://localhost:3000/note/1

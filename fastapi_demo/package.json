@@ -1,0 +1,17 @@
+{
+  "name": "fastapi_demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-fastapi": "source .venv/bin/activate && uv pip install -r requirements.txt && fastapi dev main.py"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "devDependencies": {
+    "@types/bun": "^1.2.20"
+  }
+}
