@@ -44,8 +44,11 @@ app.post(path, handler)
 
 ## Server API Framework
 
-- [ ] router = route\path -> handler
+- [ ] router
+- [ ] openapi docs
 - [ ] crud
+- [ ] db
+- [ ] auth
 
 ### next
 
