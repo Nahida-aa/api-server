@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>频道聊天演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 15px;
+      color: #ecf0f1;
+    }
+
+    .channel-list {
+      list-style: none;
+    }
+
+    .channel-item {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #34495e;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .channel-item:hover {
+      background-color: #4a6278;
+    }
+
+    .channel-item.active {
+      background-color: #3498db;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+    }
+
+    .chat-header {
+      padding: 20px;
+      background-color: #ecf0f1;
+      border-bottom: 1px solid #bdc3c7;
+    }
+
+    .chat-header h2 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .connection-status {
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .connection-status.connected {
+      color: #27ae60;
+    }
+
+    .connection-status.disconnected {
+      color: #e74c3c;
+    }
+
+    .user-list {
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .user-list h4 {
+      margin-bottom: 5px;
+      color: #495057;
+    }
+
+    .users {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .user-tag {
+      background-color: #007bff;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .messages-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 300px);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 3px solid #007bff;
+    }
+
+    .message-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .message-author {
+      font-weight: bold;
+      color: #007bff;
+      margin-right: 10px;
+    }
+
+    .message-time {
+      color: #6c757d;
+      font-size: 12px;
+    }
+
+    .message-content {
+      color: #495057;
+      line-height: 1.5;
+    }
+
+    .message-input-container {
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .user-info {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .user-info input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .message-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .message-input input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .message-input button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .message-input button:hover {
+      background-color: #0056b3;
+    }
+
+    .message-input button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .system-message {
+      text-align: center;
+      color: #6c757d;
+      font-style: italic;
+      padding: 5px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <h3>频道列表</h3>
+    <ul class="channel-list" id="channelList">
+      <li class="channel-item" data-channel="general"># 综合讨论</li>
+      <li class="channel-item" data-channel="tech"># 技术交流</li>
+      <li class="channel-item" data-channel="random"># 随机聊天</li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="chat-header">
+      <h2 id="channelTitle">选择一个频道开始聊天</h2>
+      <div class="connection-status" id="connectionStatus">未连接</div>
+    </div>
+
+    <div class="user-list" id="userListContainer" style="display: none;">
+      <h4>在线用户</h4>
+      <div class="users" id="userList"></div>
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+      <div class="system-message">请选择一个频道并输入用户信息开始聊天</div>
+    </div>
+
+    <div class="message-input-container">
+      <div class="user-info">
+        <input type="text" id="userIdInput" placeholder="用户ID" value="user123">
+        <input type="text" id="usernameInput" placeholder="用户名" value="测试用户">
+        <button onclick="connect()">连接</button>
+        <button onclick="disconnect()">断开</button>
+      </div>
+      <div class="message-input">
+        <input type="text" id="messageInput" placeholder="输入消息..." disabled>
+        <button id="sendButton" onclick="sendMessage()" disabled>发送</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    let currentChannel = null;
+    let currentUserId = null;
+    let currentUsername = null;
+    let isConnected = false;
+
+    const channelList = document.getElementById('channelList');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const channelTitle = document.getElementById('channelTitle');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const userListContainer = document.getElementById('userListContainer');
+    const userList = document.getElementById('userList');
+
+    // 频道切换
+    channelList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('channel-item')) {
+        const channelId = e.target.dataset.channel;
+        selectChannel(channelId, e.target.textContent);
+      }
+    });
+
+    // 回车发送消息
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !sendButton.disabled) {
+        sendMessage();
+      }
+    });
+
+    function connect() {
+      const userId = document.getElementById('userIdInput').value.trim();
+      const username = document.getElementById('usernameInput').value.trim();
+
+      if (!userId || !username) {
+        alert('请输入用户ID和用户名');
+        return;
+      }
+
+      currentUserId = userId;
+      currentUsername = username;
+
+      try {
+        ws = new WebSocket('ws://localhost:3000/ws');
+
+        ws.onopen = () => {
+          isConnected = true;
+          updateConnectionStatus('已连接', true);
+          messageInput.disabled = false;
+          console.log('WebSocket 连接已建立');
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleServerMessage(data);
+          } catch (error) {
+            console.error('解析消息失败:', error);
+          }
+        };
+
+        ws.onclose = () => {
+          isConnected = false;
+          updateConnectionStatus('连接已断开', false);
+          messageInput.disabled = true;
+          sendButton.disabled = true;
+          console.log('WebSocket 连接已关闭');
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket 错误:', error);
+          updateConnectionStatus('连接错误', false);
+        };
+
+      } catch (error) {
+        console.error('连接失败:', error);
+        alert('连接失败，请检查服务器是否启动');
+      }
+    }
+
+    function disconnect() {
+      if (ws) {
+        ws.close();
+        ws = null;
+        currentChannel = null;
+        isConnected = false;
+        updateConnectionStatus('未连接', false);
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+        clearMessages();
+        clearUserList();
+      }
+    }
+
+    function selectChannel(channelId, channelName) {
+      if (!isConnected) {
+        alert('请先连接到服务器');
+        return;
+      }
+
+      // 更新UI
+      document.querySelectorAll('.channel-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelector(`[data-channel="${channelId}"]`).classList.add('active');
+
+      channelTitle.textContent = channelName;
+      currentChannel = channelId;
+      sendButton.disabled = false;
+
+      // 清空消息和用户列表
+      clearMessages();
+      clearUserList();
+
+      // 发送加入频道消息
+      sendToServer({
+        op: 'joinChannel',
+        d: {
+          channelId: channelId,
+          userId: currentUserId,
+          username: currentUsername
+        }
+      });
+
+      // 显示用户列表
+      userListContainer.style.display = 'block';
+    }
+
+    function sendMessage() {
+      const content = messageInput.value.trim();
+      if (!content || !currentChannel || !isConnected) {
+        return;
+      }
+
+      sendToServer({
+        op: 'sendMessage',
+        d: {
+          channelId: currentChannel,
+          userId: currentUserId,
+          content: content,
+          contentType: 'text'
+        }
+      });
+
+      messageInput.value = '';
+    }
+
+    function sendToServer(data) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+      }
+    }
+
+    function handleServerMessage(data) {
+      console.log('收到服务器消息:', data);
+
+      switch (data.op) {
+        case 'newMessage':
+          addMessage(data.d);
+          break;
+
+        case 'userJoined':
+          addSystemMessage(`${data.d.user.username} 加入了频道`);
+          break;
+
+        case 'userLeft':
+          addSystemMessage(`用户 ${data.d.userId} 离开了频道`);
+          break;
+
+        case 'channelUsers':
+          updateUserList(data.d.users);
+          break;
+
+        case 'error':
+          console.error('服务器错误:', data.d.message);
+          alert('错误: ' + data.d.message);
+          break;
+
+        default:
+          console.log('未知消息类型:', data.op);
+      }
+    }
+
+    function addMessage(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message';
+
+      const time = new Date(message.createdAt).toLocaleTimeString();
+
+      messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">${message.userId}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-content">${escapeHtml(message.content || '')}</div>
+            `;
+
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function addSystemMessage(text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'system-message';
+      messageDiv.textContent = text;
+
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function updateUserList(users) {
+      userList.innerHTML = '';
+      users.forEach(user => {
+        const userTag = document.createElement('span');
+        userTag.className = 'user-tag';
+        userTag.textContent = user.username;
+        userList.appendChild(userTag);
+      });
+    }
+
+    function clearMessages() {
+      messagesContainer.innerHTML = '<div class="system-message">加载频道消息...</div>';
+    }
+
+    function clearUserList() {
+      userList.innerHTML = '';
+    }
+
+    function updateConnectionStatus(text, connected) {
+      connectionStatus.textContent = text;
+      connectionStatus.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 页面加载完成后自动连接
+    window.addEventListener('load', () => {
+      console.log('页面加载完成，可以手动点击连接按钮');
+    });
+  </script>
+</body>
+
+</html>

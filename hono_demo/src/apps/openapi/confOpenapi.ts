@@ -1,5 +1,5 @@
 import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
-import { AppOpenAPI } from "@/server/types";
+import type { AppOpenAPI } from "../types";
 import packageJson from '@/../package.json'
 import { Scalar } from '@scalar/hono-api-reference' // 用到了 vue, 因此需要 nodejs 运行时, 更新: pnpm i @scalar/hono-api-reference@latest
 

@@ -1,33 +1,33 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import defaultHook from "./openapi/default-hook";
-import { AppEnv, AppOpenAPI } from "./types";
+import type { AppEnv, AppOpenAPI } from "./types";
 import { requestId } from "hono/request-id";
 // import pinoHttp from "pino-http"; // Edge Runtime 不支持
-import onError from "./openapi/middlewares/on-error";
+import {onError} from "./openapi/middlewares/on-error";
 import notFound from "./openapi/middlewares/not-found";
 // import { logger } from "hono/logger";
 import { pino } from "pino";
-import { pinoLogger } from 'hono-pino' // Pino is designed for Node.js and supports browser environments.
-import pretty from 'pino-pretty'; // Pretty print for Pino logs, useful for development
-import { IS_PROD } from "../env.ts";
+import { logger } from "hono/logger";
+// import { pinoLogger } from 'hono-pino' // Pino is designed for Node.js and supports browser environments.
+// import pretty from 'pino-pretty'; // Pretty print for Pino logs, useful for development
 
 const configLogger = (app: AppOpenAPI) => {
   app.use(requestId());
-  // app.use(logger()); // 使用 Hono 内置的 logger，Edge Runtime 兼容
+  app.use(logger()); // 使用 Hono 内置的 logger，Edge Runtime 兼容
   // app.use(async (c, next) => {
   //   const start = Date.now();
   //   await next();
   //   const ms = Date.now() - start;
   //   console.log(`${c.req.method} ${c.req.url} - ${c.res.status} - ${ms}ms`);
   // });
-  app.use(
-    pinoLogger({
-      pino: pino(
-        {level: IS_PROD ? "info" : "debug"},
-        IS_PROD ? undefined : pretty()
-      )
-    }),
-  )
+  // app.use(
+  //   pinoLogger({
+  //     pino: pino(
+  //       {level: IS_PROD ? "info" : "debug"},
+  //       IS_PROD ? undefined : pretty()
+  //     )
+  //   }),
+  // )
 }
 
 const configJsonRes = (app: AppOpenAPI) => {

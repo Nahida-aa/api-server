@@ -1,5 +1,24 @@
 {
   "cSpell.words": [
     "elysia"
-  ]
+  ],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": true
+  }
 }

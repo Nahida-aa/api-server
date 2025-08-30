@@ -1,5 +1,6 @@
 {
   "name": "hono_demo",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -8,7 +9,12 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.18.2",
-    "hono": "^4.9.2"
+    "@hono/zod-openapi": "^1.1.0",
+    "@scalar/hono-api-reference": "^0.9.13",
+    "@scalar/openapi-to-markdown": "^0.2.26",
+    "hono": "^4.9.2",
+    "pino": "^9.9.0",
+    "postgres": "^3.4.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
