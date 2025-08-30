@@ -1,61 +1,44 @@
 import type { ErrorHandler } from "hono";
 // import { HTTPResponseError } from "hono/types";
-import type { ClientErrorStatusCode, InfoStatusCode, RedirectStatusCode, ServerErrorStatusCode, StatusCode, UnofficialStatusCode } from "hono/utils/http-status";
-import { INTERNAL_SERVER_ERROR, OK } from "@/server/modules/openapi/http-status-codes";
-import { AppEnv, AppOpenAPI } from "@/server/types";
-
-export interface HTTPResponseError extends Error {
-  getResponse: () => Response;
-  status: StatusCode | InfoStatusCode | RedirectStatusCode | ClientErrorStatusCode | ServerErrorStatusCode | UnofficialStatusCode;
-}
+import type { ClientErrorStatusCode, ContentfulStatusCode, InfoStatusCode, RedirectStatusCode, ServerErrorStatusCode, StatusCode, UnofficialStatusCode } from "hono/utils/http-status";
+import type { AppEnv, AppOpenAPI } from "../../types";
+import { env, getRuntimeKey } from 'hono/adapter'
+export type ErrStatusCode = UnofficialStatusCode | ClientErrorStatusCode | ServerErrorStatusCode;
+import { HTTPException } from 'hono/http-exception'
+import postgres from "postgres";
 
 /**
- * 自定义HTTP错误类，简化错误处理
+ * 工厂函数，简化错误处理, 将 HTTP 错误作为 App 错误, 叫做 AppErr , 暂时 按照 HTTP 的状态码来分类错误
  * @example
- * throw new HttpError(404, '项目未找到');
- * throw new HttpError(403, '无权限操作此项目');
+ * throw AppErr(404, '项目未找到');
+ * throw AppErr(403, '无权限操作此项目');
  */
-export class HttpError extends Error implements HTTPResponseError {
-  public status: StatusCode | InfoStatusCode | RedirectStatusCode | ClientErrorStatusCode | ServerErrorStatusCode | UnofficialStatusCode;
-
-  constructor(
-    status: StatusCode | InfoStatusCode | RedirectStatusCode | ClientErrorStatusCode | ServerErrorStatusCode | UnofficialStatusCode,
-    message: string
-  ) {
-    super(message);
-    this.name = 'HttpError';
-    this.status = status;
-    
-    // 确保 instanceof 正常工作
-    Object.setPrototypeOf(this, HttpError.prototype);
-  }
-
-  getResponse(): Response {
-    return new Response(JSON.stringify({ message: this.message }), {
-      status: this.status,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+export const AppErr = (status: ContentfulStatusCode, message: string) => {
+  return new HTTPException(status, { message });
 }
-// 
-const onError: ErrorHandler<AppEnv> = (err: Error|HTTPResponseError, c) => {
-  const currentStatus = "status" in err
-    ? err.status
-    : c.newResponse(null).status;
-  const statusCode = currentStatus !== OK
-    ? (currentStatus as UnofficialStatusCode|ClientErrorStatusCode | ServerErrorStatusCode)
-    : INTERNAL_SERVER_ERROR;
-  c.env
-  // const env = c.env?.NODE_ENV || process.env?.NODE_ENV;
-  const env = process.env?.NODE_ENV;
-  c.var.logger.debug({ path: c.req.path,  message: err.message, stack: err.stack, status: statusCode });
-  return c.json(
-    {
-      message: err.message,
-      stack: env === "production" ? undefined : err.stack,
-    },
-    statusCode,
-  );
-};
 
-export default onError;
+// PostgreSQL 错误码常量
+// const PG_ERROR_CODES = {
+//   UNIQUE_VIOLATION: '23505',
+//   FOREIGN_KEY_VIOLATION: '23503',
+//   NOT_NULL_VIOLATION: '23502',
+//   CHECK_VIOLATION: '23514',
+// } as const;
+
+export const onError: ErrorHandler<AppEnv> = (err, c) => {
+  if (err instanceof HTTPException) {
+    return err.getResponse()
+  } 
+  const { NODE_ENV } = env<{ NODE_ENV: string }>(c);
+  const {cause} = err;
+  if (cause instanceof postgres.PostgresError) {
+    return c.json({
+      message: cause.detail || cause.message,
+      stack: NODE_ENV === "development" ? err.stack : undefined
+    }, 400);
+  }
+  return c.json({
+    message: err.message,
+    stack: NODE_ENV === "development" ? err.stack : undefined
+  }, 500);
+};

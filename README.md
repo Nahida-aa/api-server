@@ -9,21 +9,6 @@ psql -l
 # 连接 url: postgres://aa@localhost:5432/web_demo
 ```
 
-| 框架 / 库      | 源码大小（MB） | 主要组成                                |
-| ----------- | -------- | ----------------------------------- |
-| **React**   | 0.5–2    | 组件、hooks、context、路由（React Router）   |
-| **Vue**     | 0.5–2    | 组件、composables、router、store         |
-| **Svelte**  | 0.5–2    | 组件、stores、router（svelte-kit）        |
-| **Next.js** | 2–10     | pages/app、React 组件、API routes、配置    |
-| **Nuxt**    | 2–10     | pages/components/composables、模板、配置  |
-| **Hono**    | <1       | 路由、handler、schemas                  |
-| **Elysia**  | <1       | 路由、schemas、插件                       |
-| **FastAPI** | <1       | Python 代码、Pydantic schemas、路由       |
-| **Django**  | 1–5      | settings、urls、migrations、模板         |
-| **Gin**     | <1       | Go handler + routing                |
-| **Axum**    | <1       | Rust handler + routing + Cargo.toml |
-| **Spring**  | 3–10     | Java 代码 + resources + 配置            |
-
 ## 命名
 
 | name | description | main |
@@ -123,3 +108,4 @@ func main() {
 
 ### svelte
 
+### astro
